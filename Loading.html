@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>جاري التحميل...</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    /* Reset and Base Styles */
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: #111;
+      overflow: hidden;
+    }
+    
+    #particles-js {
+      width: 100%;
+      height: 100%;
+      background-color: #b61924;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    
+    /* Circular Progress Bar */
+    .progress-container {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1000;
+      text-align: center;
+    }
+    
+    .circular-progress {
+      position: relative;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: conic-gradient(#4d5bf9 0deg, #cadcff 0deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+    
+    .circular-progress::before {
+      content: "";
+      position: absolute;
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      background-color: #b61924;
+    }
+    
+    .progress-value {
+      position: relative;
+      font-size: 24px;
+      font-weight: bold;
+      color: white;
+      z-index: 1;
+    }
+    
+    .progress-text {
+      margin-top: 15px;
+      color: white;
+      font-size: 18px;
+      font-weight: 500;
+      letter-spacing: 1px;
+    }
+    
+    /* Pulsing Animation */
+    @keyframes pulse {
+      0% { transform: translate(-50%, -50%) scale(1); }
+      50% { transform: translate(-50%, -50%) scale(1.05); }
+      100% { transform: translate(-50%, -50%) scale(1); }
+    }
+    
+    .progress-container {
+      animation: pulse 2s infinite;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Circular Progress Bar -->
+<div class="progress-container">
+  <div class="circular-progress" id="circularProgress">
+    <span class="progress-value" id="progressValue">0%</span>
+  </div>
+  <!-- ✨ تعديل: تعريب النص -->
+  <div class="progress-text">جاري التحميل...</div>
+</div>
+
+<!-- Particles.js Container -->
+<div id="particles-js"></div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script>
+  // Circular Progress Animation
+  const circularProgress = document.getElementById("circularProgress");
+  const progressValue = document.getElementById("progressValue");
+  
+  let progressStartValue = 0;
+  const progressEndValue = 100;
+  // ✨ تعديل: تم تغيير المدة إلى 4 ثوانٍ (4000 ميلي ثانية)
+  const duration = 1000; 
+  const increment = (progressEndValue - progressStartValue) / (duration / 16.67);
+  
+  const progress = setInterval(() => {
+    progressStartValue += increment;
+    // التأكد من أن القيمة لا تتجاوز 100
+    const displayValue = Math.min(Math.round(progressStartValue), 100);
+    progressValue.textContent = `${displayValue}%`;
+    circularProgress.style.background = `conic-gradient(#4d5bf9 ${displayValue * 3.6}deg, #cadcff 0deg)`;
+    
+    // ✨ تعديل: هذا هو الشرط الذي يتحقق عند اكتمال التحميل
+    if (progressStartValue >= progressEndValue) {
+      clearInterval(progress);
+      // ✨ تعديل: هذا هو السطر الذي يقوم بإعادة التوجيه إلى الصفحة الرئيسية
+      window.location.href = '/'; 
+    }
+  }, 16.67);
+
+  // Particles.js Initialization
+  particlesJS('particles-js', {
+    "particles": {
+      "number": { "value": 80, "density": { "enable": true, "value_area": 800 } },
+      "color": { "value": "#ffffff" },
+      "shape": { "type": "circle" },
+      "opacity": { "value": 0.5 },
+      "size": { "value": 5, "random": true },
+      "line_linked": { "enable": true, "distance": 150, "color": "#ffffff", "opacity": 0.4, "width": 1 },
+      "move": { "enable": true, "speed": 6, "direction": "none" }
+    },
+    "interactivity": {
+      "detect_on": "canvas",
+      "events": {
+        "onhover": { "enable": true, "mode": "repulse" },
+        "onclick": { "enable": true, "mode": "push" },
+        "resize": true
+      }
+    },
+    "retina_detect": true
+  });
+</script>
+
+</body>
+</html>

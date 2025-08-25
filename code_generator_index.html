@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مولد رموز التحقق</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <style>
+        /* --- بداية التنسيقات --- */
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover-color: #4338ca;
+            --background-color: #111827;
+            --container-bg-color: rgba(31, 41, 55, 0.8);
+            --text-color: #e5e7eb;
+            --heading-color: #f9fafb;
+            --box-shadow-color: rgba(0, 0, 0, 0.3);
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -2;
+            background-color: var(--background-color);
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            color: var(--text-color);
+            margin: 0;
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(45deg, #4f46e5, #ec4899);
+            border-radius: 50%;
+            filter: blur(100px);
+            animation: animate-orb 15s infinite alternate;
+            top: 10%;
+            left: 15%;
+            z-index: -1;
+            opacity: 0.6;
+        }
+        body::after {
+            content: '';
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            background: linear-gradient(45deg, #38bdf8, #34d399);
+            border-radius: 50%;
+            filter: blur(90px);
+            animation: animate-orb 20s infinite alternate-reverse;
+            bottom: 10%;
+            right: 15%;
+            z-index: -1;
+            opacity: 0.6;
+        }
+        @keyframes animate-orb {
+            to { transform: translate(50px, 100px) scale(1.2); }
+        }
+
+        .main-wrapper {
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header-logo img {
+            width: 300px;
+            height: auto;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            filter: drop-shadow(0 0 10px rgba(79, 70, 229, 0.5));
+            /* ✨ جديد: إضافة الحركة للصورة */
+            animation: float-animation 4s ease-in-out infinite;
+        }
+
+        /* ✨ جديد: تعريف الحركة */
+        @keyframes float-animation {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .container {
+            position: relative;
+            background-color: var(--container-bg-color);
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px var(--box-shadow-color);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: "";
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            top: -25%;
+            left: -25%;
+            filter: drop-shadow(0 15px 50px #000);
+            border-radius: 20px;
+            animation: rotating 8s linear infinite;
+            background: conic-gradient(#4f46e5, #ec4899, #38bdf8, #34d399, #4f46e5);
+            z-index: -1;
+            opacity: 0.5;
+        }
+
+        .container::after {
+            content: "";
+            position: absolute;
+            inset: 2px;
+            background: var(--container-bg-color);
+            border-radius: 14px;
+            z-index: -1;
+        }
+
+        @keyframes rotating {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        h1 {
+            color: var(--heading-color);
+            margin-top: 0;
+            margin-bottom: 1rem;
+            font-size: 2rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        p {
+            margin-bottom: 2rem;
+            color: #9ca3af;
+            font-size: 1.1rem;
+        }
+
+        .user-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            gap: 1rem;
+        }
+
+        .user-list a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 1rem;
+            background-color: var(--primary-color);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .user-list a:hover {
+            background-color: var(--primary-hover-color);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.6);
+        }
+        
+        .user-list a::before {
+            content: '👤';
+            font-size: 1.5rem;
+            transition: transform 0.3s;
+        }
+
+        .user-list a:hover::before {
+            transform: scale(1.2);
+        }
+
+        .user-list a::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+            z-index: -1;
+        }
+
+        .user-list a:hover::after {
+            left: 100%;
+        }
+
+        .no-users {
+            color: #6b7280;
+            font-style: italic;
+            font-size: 1.1rem;
+            padding: 2rem 0;
+        }
+        /* --- نهاية التنسيقات --- */
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+    
+    <div class="main-wrapper">
+        <div class="header-logo">
+            <img src="{{ url_for('static', filename='generator_icon.png') }}" alt="أيقونة المولد" />
+        </div>
+
+        <div class="container">
+            <h1>المستخدمون المنتظرون</h1>
+            <p>انقر على اسم المستخدم لعرض رمز التحقق الخاص به.</p>
+            
+            {% if pending_users %}
+                <ul class="user-list">
+                    {% for user in pending_users %}
+                        <li>
+                            <a href="{{ url_for('get_user_code', username=user) }}">
+                                {{ user }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="no-users">لا يوجد مستخدمون ينتظرون التحقق حاليًا.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            particlesJS("particles-js", {
+                "particles": {
+                    "number": { "value": 60, "density": { "enable": true, "value_area": 800 } },
+                    "color": { "value": "#ffffff" },
+                    "shape": { "type": "circle", "stroke": { "width": 0, "color": "#000000" }, "polygon": { "nb_sides": 5 } },
+                    "opacity": { "value": 0.3, "random": true, "anim": { "enable": false, "speed": 1, "opacity_min": 0.1, "sync": false } },
+                    "size": { "value": 2, "random": true, "anim": { "enable": false, "speed": 40, "size_min": 0.1, "sync": false } },
+                    "line_linked": { "enable": true, "distance": 150, "color": "#ffffff", "opacity": 0.2, "width": 1 },
+                    "move": { "enable": true, "speed": 3, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false, "attract": { "enable": false, "rotateX": 600, "rotateY": 1200 } }
+                },
+                "interactivity": {
+                    "detect_on": "canvas",
+                    "events": { "onhover": { "enable": true, "mode": "grab" }, "onclick": { "enable": true, "mode": "push" }, "resize": true },
+                    "modes": {
+                        "grab": { "distance": 140, "line_linked": { "opacity": 0.5 } },
+                        "bubble": { "distance": 400, "size": 40, "duration": 2, "opacity": 8, "speed": 3 },
+                        "repulse": { "distance": 200, "duration": 0.4 },
+                        "push": { "particles_nb": 4 },
+                        "remove": { "particles_nb": 2 }
+                    }
+                },
+                "retina_detect": true
+            });
+        });
+    </script>
+</body>
+</html>

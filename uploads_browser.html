@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>الملفات المرفوعة</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <!-- ✨ إضافة مكتبة Socket.IO -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            background-color: #000;
+        }
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            z-index: -1;
+            top: 0;
+            left: 0;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+        h1 {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+        a {
+            color: #00c3ff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            padding: 8px 12px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+            text-align: right;
+            word-break: break-all;
+            cursor: pointer;
+        }
+        th {
+            background-color: rgba(255, 255, 255, 0.1);
+            user-select: none;
+            font-weight: 600;
+        }
+        tr:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .file-name a {
+            font-weight: bold;
+            color: #fff;
+        }
+        .file-size, .file-modified {
+            font-size: 0.9em;
+            color: #ccc;
+        }
+        .uploader-name {
+            color: #ddd;
+            font-weight: 500;
+        }
+        .download-btn {
+            display: inline-block;
+            margin-top: 5px;
+            font-size: 0.9em;
+            padding: 5px 10px;
+            background-color: #28a745;
+            color: white;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+        .download-btn:hover {
+            background-color: #218838;
+            text-decoration: none;
+        }
+        .asc::after {
+            content: " ▲";
+        }
+        .desc::after {
+            content: " ▼";
+        }
+        .no-files {
+            text-align: center;
+            font-size: 1.2em;
+            color: #ccc;
+            padding: 30px 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+    <div class="container">
+        <a href="{{ url_for('index') }}" class="back-link">&larr; العودة إلى الدردشة</a>
+        <h1>تصفح الملفات المشاركة</h1>
+        {% if files %}
+            <table id="filesTable">
+                <thead>
+                    <tr>
+                        <th data-type="string">اسم الملف</th>
+                        <th data-type="size">الحجم</th>
+                        <th data-type="date">تاريخ الرفع</th>
+                        <th data-type="string">تم الرفع بواسطة</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for file in files %}
+                    <tr>
+                        <td class="file-name">
+                            <a href="{{ file.url }}" target="_blank" rel="noopener noreferrer">{{ file.name }}</a>
+                            <a href="{{ file.url }}" download="{{ file.name }}" class="download-btn">📥 تنزيل</a>
+                        </td>
+                        <td class="file-size">{{ file.size | format_bytes }}</td>
+                        <td class="file-modified">{{ file.modified }}</td>
+                        <td class="uploader-name">{{ file.uploader }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="no-files">لم يتم رفع أي ملفات بعد.</p>
+        {% endif %}
+    </div>
+
+    <script>
+        // دالة الفرز
+        function sortTableByColumn(index, type, asc = true) {
+            const table = document.getElementById("filesTable");
+            const tbody = table.querySelector("tbody");
+            const rows = Array.from(tbody.querySelectorAll("tr"));
+
+            rows.sort((a, b) => {
+                let valA = a.cells[index].innerText.trim();
+                let valB = b.cells[index].innerText.trim();
+
+                if (type === "size") {
+                    const toBytes = v => {
+                        let num = parseFloat(v);
+                        if (/KB/i.test(v)) num *= 1024;
+                        else if (/MB/i.test(v)) num *= 1024 * 1024;
+                        else if (/GB/i.test(v)) num *= 1024 * 1024 * 1024;
+                        return num || 0;
+                    };
+                    valA = toBytes(valA);
+                    valB = toBytes(valB);
+                } else if (type === "date") {
+                    valA = new Date(valA).getTime();
+                    valB = new Date(valB).getTime();
+                }
+
+                if (valA < valB) return asc ? -1 : 1;
+                if (valA > valB) return asc ? 1 : -1;
+                return 0;
+            });
+
+            tbody.innerHTML = "";
+            rows.forEach(r => tbody.appendChild(r));
+        }
+
+        // إضافة حدث النقر على العناوين للفرز
+        document.querySelectorAll("#filesTable th").forEach((th, index) => {
+            th.addEventListener("click", () => {
+                const type = th.getAttribute("data-type");
+                const isAsc = th.classList.toggle("asc");
+                if (!isAsc) {
+                    th.classList.add("desc");
+                } else {
+                    th.classList.remove("desc");
+                }
+                // إزالة الحالة من الأعمدة الأخرى
+                document.querySelectorAll("#filesTable th").forEach(h => {
+                    if (h !== th) h.classList.remove("asc", "desc");
+                });
+                sortTableByColumn(index, type, isAsc);
+            });
+        });
+
+        // فرز افتراضي: حسب تاريخ الرفع (الأحدث أولاً)
+        window.addEventListener("DOMContentLoaded", () => {
+            sortTableByColumn(2, "date", false); // تنازلي
+            const dateHeader = document.querySelectorAll("#filesTable th")[2];
+            dateHeader.classList.add("desc");
+        });
+
+        // تهيئة Particles.js
+        particlesJS("particles-js", {
+            "particles": {
+                "number": { "value": 50, "density": { "enable": true, "value_area": 800 } },
+                "shape": {
+                    "type": "image",
+                    "image": {
+                        "src": "/static/image.png",
+                        "width": 100,
+                        "height": 100
+                    }
+                },
+                "opacity": { "value": 0.5 },
+                "size": { "value": 20, "random": true },
+                "move": { "enable": true, "speed": 3 },
+                "line_linked": { "enable": false }
+            },
+            "interactivity": {
+                "events": {
+                    "onhover": { "enable": true, "mode": "attract" },
+                    "onclick": { "enable": true, "mode": "push" },
+                    "resize": true
+                },
+                "modes": {
+                    "attract": { "distance": 200, "duration": 0.4 },
+                    "push": { "particles_nb": 5 }
+                }
+            },
+            "retina_detect": true
+        });
+
+        // اتصال Socket.IO لمراقبة الحالة
+        const socket = io(window.location.origin);
+
+        socket.on('connect', () => {
+            console.log('تم الاتصال بالخادم من صفحة الملفات.');
+        });
+
+        socket.on('disconnect', () => {
+            console.log('انقطع الاتصال بالخادم. جارٍ إعادة التحميل...');
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>التحقق من الدخول</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <style>
+        /* --- بداية التنسيقات --- */
+        :root {
+            --primary-color: #28a745;
+            --primary-hover-color: #218838;
+            --background-gradient-start: #f0f2f5;
+            --background-gradient-end: #e6e9ee;
+            --form-background-color: #ffffff;
+            --text-color: #333;
+            --label-color: #555;
+            --input-border-color: #ced4da;
+            --input-focus-border-color: #28a745;
+            --box-shadow-color: rgba(0, 0, 0, 0.1);
+            --flash-error-bg: #dc3545;
+            --link-color: #007bff;
+            --timer-progress-color: #28a745;
+            --timer-progress-warning-color: #ffc107;
+            --timer-progress-expired-color: #dc3545;
+        }
+        
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, var(--background-gradient-start), var(--background-gradient-end));
+            z-index: -1;
+        }
+        
+        body { 
+            margin: 0; 
+            font-family: 'Cairo', sans-serif; 
+            color: var(--text-color); 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .main-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4rem;
+            flex-wrap: wrap-reverse;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .verify-icon img {
+            width: 350px;
+            height: auto;
+            animation: float-animation 4s ease-in-out infinite;
+        }
+
+        @keyframes float-animation {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .verify-container { 
+            background: var(--form-background-color); 
+            padding: 3rem; 
+            border-radius: 16px; 
+            box-shadow: 0 10px 30px var(--box-shadow-color); 
+            text-align: center; 
+            width: 100%;
+            max-width: 450px;
+            animation: fadeIn 0.5s ease-in-out;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        h1 { font-size: 1.8rem; margin-bottom: 0.5rem; margin-top: 0; }
+        p { font-size: 1rem; color: var(--label-color); margin-bottom: 1.5rem; }
+        
+        .code-info { font-size: 0.95rem; color: #6c757d; margin-top: 1.5rem; line-height: 1.6; }
+        .code-info a { color: var(--link-color); font-weight: 600; text-decoration: none; }
+        .code-info a:hover { text-decoration: underline; }
+        
+        form { display: flex; flex-direction: column; align-items: center; width: 100%; }
+        
+        label { font-weight: 600; margin-bottom: 0.8rem; font-size: 1.1rem; }
+        
+        input { 
+            padding: 0.8rem; 
+            margin-bottom: 1.5rem;
+            border: 2px solid var(--input-border-color);
+            border-radius: 8px; 
+            font-size: 2.5rem; 
+            font-weight: 700;
+            text-align: center; 
+            width: 90%; 
+            letter-spacing: 12px; 
+            text-transform: uppercase; 
+            box-sizing: border-box;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        
+        input:focus { 
+            outline: none; 
+            border-color: var(--input-focus-border-color); 
+            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.25);
+        }
+        
+        button { 
+            border: none; 
+            padding: 0.85rem; 
+            border-radius: 8px; 
+            font-size: 1.1rem; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: background-color 0.3s, transform 0.2s;
+            font-family: 'Cairo', sans-serif;
+            width: 100%;
+            background-color: var(--primary-color);
+            color: white;
+        }
+        button:hover { 
+            background-color: var(--primary-hover-color);
+            transform: translateY(-2px);
+        }
+        
+        /* ✨ جديد: تنسيق زر الإلغاء */
+        .cancel-btn {
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+            margin-top: 0.75rem;
+            border: 1px solid var(--input-border-color);
+            padding: 0.85rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            font-family: 'Cairo', sans-serif;
+            background-color: transparent;
+            color: var(--label-color);
+            text-decoration: none;
+        }
+        .cancel-btn:hover {
+            background-color: #f8f9fa;
+            color: var(--text-color);
+        }
+
+        .flash-message { padding: 0.85rem 1rem; margin-bottom: 1.5rem; border-radius: 8px; color: #fff; font-weight: 500; background-color: var(--flash-error-bg); width: 100%; box-sizing: border-box; text-align: center; }
+        
+        .timer-wrapper { position: relative; width: 100px; height: 100px; margin: 0 auto 2rem auto; }
+        .timer-wrapper svg { transform: rotate(-90deg); width: 100px; height: 100px; }
+        .timer-wrapper .timer-bg { fill: none; stroke: #e6e6e6; stroke-width: 8; }
+        .timer-wrapper .timer-progress { fill: none; stroke: var(--timer-progress-color); stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 1s linear, stroke 0.5s; }
+        #timer-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.8rem; font-weight: 700; }
+        /* --- نهاية التنسيقات --- */
+    </style>
+</head>
+<body data-timestamp="{{ timestamp }}">
+
+    <div id="particles-js"></div>
+    
+    <div class="main-wrapper">
+
+        <div class="verify-icon">
+            <img src="{{ url_for('static', filename='verify_icon.png') }}" alt="أيقونة التحقق" />
+        </div>
+
+        <div class="verify-container">
+            <h1>مرحباً، {{ user }}!</h1>
+            <p>مطلوب خطوة أخيرة لتأمين حسابك.</p>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="flash-message">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="timer-wrapper">
+                <svg>
+                    <circle class="timer-bg" cx="50" cy="50" r="46"/>
+                    <circle id="timer-progress" class="timer-progress" cx="50" cy="50" r="46"/>
+                </svg>
+                <span id="timer-text">20</span>
+            </div>
+
+            <form method="post" action="{{ url_for('verify') }}">
+                <label for="verification_code">أدخل رمز التحقق</label>
+                <input type="text" id="verification_code" name="verification_code" required maxlength="6" autofocus>
+                <button type="submit" id="submit-btn">تحقق</button>
+            </form>
+
+            <!-- ✨ جديد: زر إلغاء التحقق -->
+            <a href="{{ url_for('login') }}" class="cancel-btn">إلغاء والعودة</a>
+
+            <div class="code-info">
+                اذهب إلى <a href="{{ url_for('code_generator_index') }}" target="_blank">صفحة توليد الأكواد</a>
+                 للحصول على رمزك.
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const timerTextElement = document.getElementById('timer-text');
+            const timerProgressCircle = document.getElementById('timer-progress');
+            const body = document.body;
+            const serverTimestamp = parseFloat(body.dataset.timestamp);
+
+            if (serverTimestamp && timerTextElement && timerProgressCircle) {
+                const DURATION = 20;
+                const circumference = 2 * Math.PI * timerProgressCircle.r.baseVal.value;
+                timerProgressCircle.style.strokeDasharray = circumference;
+
+                const timerInterval = setInterval(() => {
+                    const now = new Date().getTime() / 1000;
+                    const elapsed = Math.floor(now - serverTimestamp);
+                    const remaining = DURATION - elapsed;
+                    
+                    const progress = remaining / DURATION;
+                    const offset = circumference * (1 - progress);
+                    timerProgressCircle.style.strokeDashoffset = offset;
+
+                    if (remaining <= 0) {
+                        clearInterval(timerInterval);
+                        timerTextElement.textContent = "!";
+                        timerProgressCircle.style.stroke = 'var(--timer-progress-expired-color)';
+                        setTimeout(() => { window.location.href = '/login'; }, 1500);
+                    } else {
+                        timerTextElement.textContent = remaining;
+                        if (remaining <= 5) {
+                            timerProgressCircle.style.stroke = 'var(--timer-progress-warning-color)';
+                        } else {
+                             timerProgressCircle.style.stroke = 'var(--timer-progress-color)';
+                        }
+                    }
+                }, 1000);
+            }
+
+            // تهيئة particles.js
+            particlesJS("particles-js", {
+                "particles": {
+                    "number": { "value": 80, "density": { "enable": true, "value_area": 800 } },
+                    "color": { "value": "#28a745" },
+                    "shape": { "type": "circle", "stroke": { "width": 0, "color": "#000000" }, "polygon": { "nb_sides": 5 } },
+                    "opacity": { "value": 0.3, "random": false, "anim": { "enable": false, "speed": 1, "opacity_min": 0.1, "sync": false } },
+                    "size": { "value": 3, "random": true, "anim": { "enable": false, "speed": 40, "size_min": 0.1, "sync": false } },
+                    "line_linked": { "enable": true, "distance": 150, "color": "#28a745", "opacity": 0.2, "width": 1 },
+                    "move": { "enable": true, "speed": 2, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false, "attract": { "enable": false, "rotateX": 600, "rotateY": 1200 } }
+                },
+                "interactivity": {
+                    "detect_on": "canvas",
+                    "events": { "onhover": { "enable": true, "mode": "grab" }, "onclick": { "enable": true, "mode": "push" }, "resize": true },
+                    "modes": {
+                        "grab": { "distance": 140, "line_linked": { "opacity": 1 } },
+                        "bubble": { "distance": 400, "size": 40, "duration": 2, "opacity": 8, "speed": 3 },
+                        "repulse": { "distance": 200, "duration": 0.4 },
+                        "push": { "particles_nb": 4 },
+                        "remove": { "particles_nb": 2 }
+                    }
+                },
+                "retina_detect": true
+            });
+        });
+    </script>
+</body>
+</html>

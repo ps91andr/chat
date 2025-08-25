@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>رمز التحقق لـ {{ user }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        /* --- بداية التنسيقات --- */
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: #111827;
+            color: #fff;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(45deg, #4f46e5, #ec4899);
+            border-radius: 50%;
+            filter: blur(100px);
+            animation: animate-orb 15s infinite alternate;
+            top: 10%;
+            left: 15%;
+        }
+        body::after {
+            content: '';
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            background: linear-gradient(45deg, #38bdf8, #34d399);
+            border-radius: 50%;
+            filter: blur(90px);
+            animation: animate-orb 20s infinite alternate-reverse;
+            bottom: 10%;
+            right: 15%;
+        }
+        @keyframes animate-orb {
+            to { transform: translate(50px, 100px) scale(1.2); }
+        }
+
+        .bubbles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            overflow: hidden;
+        }
+        
+        .bubble {
+            position: absolute;
+            bottom: -100px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: rise linear infinite;
+            opacity: 0.6;
+        }
+        
+        @keyframes rise {
+            0% { bottom: -100px; transform: translateX(0); }
+            50% { transform: translateX(100px); }
+            100% { bottom: 100vh; transform: translateX(-100px); }
+        }
+
+        .main-wrapper {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            /* ✨ جديد: تنظيم العناصر عمودياً */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+        }
+        
+        /* ✨ جديد: تنسيق أيقونة الرأس المتحركة */
+        .header-icon img {
+            width: 250px;
+            height: auto;
+            filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.3));
+            animation: float-animation 4s ease-in-out infinite;
+        }
+
+        @keyframes float-animation {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .code-display {
+            position: relative;
+            padding: 3rem 4rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            width: 100%;
+            max-width: 500px;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .code-display::before {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            filter: drop-shadow(0 15px 50px #000);
+            border-radius: 20px;
+            animation: rotating 6s linear infinite;
+            background: conic-gradient(#4f46e5, #ec4899, #38bdf8, #34d399, #4f46e5);
+            z-index: -1;
+        }
+
+        .code-display::after {
+            content: "";
+            position: absolute;
+            inset: 2px;
+            background: rgba(45, 45, 57, 0.7);
+            border-radius: 18px;
+            z-index: -1;
+        }
+
+        @keyframes rotating {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        h1 {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+            margin-top: 0;
+            color: rgba(255, 255, 255, 0.8);
+            transition: color 0.3s ease;
+        }
+
+        .username {
+            font-weight: 700;
+            color: #a5b4fc;
+        }
+
+        .code {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 5rem;
+            letter-spacing: 15px;
+            padding-left: 15px;
+            margin: 2rem 0;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            user-select: all;
+            cursor: pointer;
+            color: #6ee7b7;
+            text-shadow: 0 0 10px #6ee7b7, 0 0 20px rgba(110, 231, 183, 0.5);
+        }
+
+        .copy-btn {
+            margin-top: 1rem;
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            background-color: #4f46e5;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 600;
+            transition: background-color 0.3s, transform 0.2s;
+            position: relative;
+            z-index: 1;
+        }
+        .copy-btn:hover {
+            background-color: #4338ca;
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 480px) {
+            .code-display { padding: 2rem 1.5rem; }
+            .code { font-size: 3rem; letter-spacing: 10px; padding-left: 10px; }
+            h1 { font-size: 1.1rem; }
+            .header-icon img { width: 200px; }
+        }
+        /* --- نهاية التنسيقات --- */
+    </style>
+</head>
+<body>
+    <div class="bubbles" id="bubbles"></div>
+    
+    <div class="main-wrapper">
+        <!-- ✨ جديد: عنصر الصورة المتحركة -->
+        <div class="header-icon">
+            <img src="{{ url_for('static', filename='code_icon.png') }}" alt="أيقونة الرمز" />
+        </div>
+
+        <div class="code-display">
+            <h1>رمز التحقق للمستخدم <span class="username">{{ user }}</span> هو:</h1>
+            <div class="code" id="verificationCode" title="انقر لنسخ الرمز">{{ code }}</div>
+            <button class="copy-btn" id="copyBtn">نسخ وإغلاق</button>
+        </div>
+    </div>
+
+    <script>
+        function copyElementText(element) {
+            const selection = window.getSelection();
+            const range = document.createRange();
+            range.selectNodeContents(element);
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                selection.removeAllRanges();
+                return true;
+            } catch (err) {
+                selection.removeAllRanges();
+                return false;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const bubblesContainer = document.getElementById('bubbles');
+            if (bubblesContainer) {
+                const bubbleCount = 30;
+                for (let i = 0; i < bubbleCount; i++) {
+                    const bubble = document.createElement('div');
+                    bubble.classList.add('bubble');
+                    const size = Math.random() * 90 + 10;
+                    bubble.style.width = `${size}px`;
+                    bubble.style.height = `${size}px`;
+                    bubble.style.left = `${Math.random() * 100}%`;
+                    const duration = `${Math.random() * 10 + 10}s`;
+                    bubble.style.animationDuration = duration;
+                    bubble.style.animationDelay = `${Math.random() * 5}s`;
+                    bubblesContainer.appendChild(bubble);
+                }
+            }
+
+            const copyBtn = document.getElementById("copyBtn");
+            const codeElement = document.getElementById("verificationCode");
+            const headingElement = document.querySelector(".code-display h1");
+            const originalHeadingHTML = headingElement.innerHTML;
+
+            if (codeElement && copyBtn && headingElement) {
+                codeElement.addEventListener('click', () => {
+                    if (copyElementText(codeElement)) {
+                        headingElement.innerHTML = `<span style="color: #6ee7b7;">تم نسخ الرمز بنجاح!</span>`;
+                        setTimeout(() => {
+                            headingElement.innerHTML = originalHeadingHTML;
+                        }, 2000);
+                    } else {
+                        alert("فشل النسخ، يرجى النسخ يدويًا.");
+                    }
+                });
+
+                copyBtn.addEventListener('click', () => {
+                    if (copyElementText(codeElement)) {
+                        window.close();
+                    } else {
+                        alert("فشل النسخ، يرجى النسخ يدويًا.");
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة المستخدمين</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <style>
+        :root {
+            --primary-btn-bg: rgba(66, 153, 225, 0.8);
+            --primary-btn-hover: rgba(43, 108, 176, 0.9);
+            --danger-btn-bg: rgba(245, 101, 101, 0.8);
+            --danger-btn-hover: rgba(197, 48, 48, 0.9);
+            --success-flash-bg: rgba(72, 187, 120, 0.9);
+            --error-flash-bg: rgba(245, 101, 101, 0.9);
+            --online-color: rgba(72, 187, 120, 0.9);
+            --offline-color: rgba(160, 174, 192, 0.8);
+            --modal-bg: rgba(0, 0, 0, 0.7);
+            --text-color: #ffffff;
+            --text-color-dark: #2d3748;
+        }
+        
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            z-index: -1;
+        }
+        
+        body {
+            font-family: 'Cairo', sans-serif;
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            background: transparent;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.1);
+            <!-- backdrop-filter: blur(10px); -->
+            padding: 1.5rem;
+            border-radius: 0;
+            box-shadow: none;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2rem;
+            color: white;
+        }
+        
+        .back-link {
+            text-decoration: none;
+            background-color: var(--offline-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+            border: none;
+        }
+        
+        .back-link:hover {
+            background-color: rgba(113, 128, 150, 0.8);
+        }
+        
+        .flash-messages {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 1.5rem;
+        }
+        
+        .flash-message {
+            padding: 1rem;
+            border-radius: 6px;
+            color: white;
+            margin-bottom: 1rem;
+            border: none;
+        }
+        
+        .flash-message.success { background-color: var(--success-flash-bg); }
+        .flash-message.error { background-color: var(--error-flash-bg); }
+
+        .add-user-form {
+            background-color: rgba(247, 250, 252, 0.2);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: none;
+            margin-bottom: 2rem;
+            b<!-- ackdrop-filter: bl -->ur(5px);
+        }
+        
+        .add-user-form h2 {
+            margin-top: 0;
+            margin-bottom: 1rem;
+            color: white;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+        
+        .form-row input {
+            flex-grow: 1;
+            padding: 0.6rem;
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            font-family: 'Cairo', sans-serif;
+            color: white;
+        }
+        
+        .form-row input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .form-row button {
+            padding: 0.6rem 1.5rem;
+            font-family: 'Cairo', sans-serif;
+            border: none;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+            background-color: rgba(255, 255, 255, 0.1);
+            b<!-- ackdrop-filter: bl -->ur(5px);
+            border: none;
+        }
+        
+        th, td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        
+        th {
+            background-color: rgba(74, 85, 104, 0.7);
+            font-weight: 600;
+            border: none;
+        }
+        
+        th.sortable {
+            cursor: pointer;
+        }
+        
+        th.sortable:hover {
+            background-color: rgba(45, 55, 72, 0.8);
+        }
+        
+        .sort-icon {
+            margin-right: 8px;
+            color: rgba(160, 174, 192, 0.8);
+        }
+        
+        th.sorted .sort-icon {
+            color: white;
+        }
+        
+        tr:nth-child(even) {
+            background-color: rgba(247, 250, 252, 0.1);
+        }
+        
+        .status {
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+            border: none;
+        }
+        
+        .status.online { background-color: var(--online-color); }
+        .status.offline { background-color: var(--offline-color); }
+        
+        .actions button {
+            margin-left: 0.5rem;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.9rem;
+            border: none;
+        }
+        
+        button {
+            border: none;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .edit-btn { background-color: var(--primary-btn-bg); }
+        .edit-btn:hover { background-color: var(--primary-btn-hover); }
+        .delete-btn { background-color: var(--danger-btn-bg); }
+        .delete-btn:hover { background-color: var(--danger-btn-hover); }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: var(--modal-bg);
+            b<!-- ackdrop-filter: bl -->ur(3px);
+        }
+        
+        .modal-content {
+            background-color: rgba(255, 255, 255, 0.9);
+            margin: 15% auto;
+            padding: 2rem;
+            border: none;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 8px;
+            position: relative;
+        }
+        
+        .close-btn {
+            color: #aaa;
+            position: absolute;
+            left: 1rem;
+            top: 0.5rem;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .modal h2 { 
+            margin-top: 0;
+            color: var(--text-color-dark);
+        }
+        
+        .modal form label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-color-dark);
+        }
+        
+        .modal form input {
+            width: 100%;
+            padding: 0.6rem;
+            margin-bottom: 1rem;
+            background-color: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            box-sizing: border-box;
+            color: var(--text-color-dark);
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+    
+    <div class="container">
+        <div class="header">
+            <h1><i class="fa-solid fa-users-cog"></i> إدارة المستخدمين</h1>
+            <a href="{{ url_for('index') }}" class="back-link">&larr; العودة إلى الدردشة</a>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flash-messages">
+                {% for category, message in messages %}
+                    <li class="flash-message {{ category }}">{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <div class="add-user-form">
+            <h2>إضافة مستخدم جديد</h2>
+            <form action="{{ url_for('admin_add_user') }}" method="POST">
+                <div class="form-row">
+                    <input type="text" name="username" placeholder="اسم المستخدم" required>
+                    <input type="text" name="password" placeholder="كلمة المرور" required>
+                    <button type="submit" class="edit-btn"><i class="fa-solid fa-plus"></i> إضافة مستخدم</button>
+                </div>
+            </form>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th class="sortable" data-column="0" data-type="string">
+                        <i class="fas fa-sort sort-icon"></i>اسم المستخدم
+                    </th>
+                    <th class="sortable" data-column="1" data-type="string">
+                        <i class="fas fa-sort sort-icon"></i>كلمة السر
+                    </th>
+                    <th class="sortable" data-column="2" data-type="status">
+                        <i class="fas fa-sort sort-icon"></i>الحالة
+                    </th>
+                    <th>الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody id="userTableBody">
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.password }}</td>
+                    <td>
+                        {% if user.is_online %}
+                            <span class="status online">متصل</span>
+                        {% else %}
+                            <span class="status offline">غير متصل</span>
+                        {% endif %}
+                    </td>
+                    <td class="actions">
+                        <button class="edit-btn"
+                                data-username="{{ user.username }}"
+                                data-password="{{ user.password }}">
+                            <i class="fa-solid fa-pen-to-square"></i> تعديل
+                        </button>
+                        {% if user.username != admin_user %}
+                        <form action="{{ url_for('admin_delete_user') }}" method="POST" style="display:inline;" onsubmit="return confirm('هل أنت متأكد من حذف هذا المستخدم؟ لا يمكن التراجع عن هذا الإجراء.');">
+                            <input type="hidden" name="username" value="{{ user.username }}">
+                            <button type="submit" class="delete-btn">
+                                <i class="fa-solid fa-trash-can"></i> حذف
+                            </button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div id="editUserModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>تعديل المستخدم</h2>
+            <form id="editUserForm" action="{{ url_for('admin_edit_user') }}" method="POST">
+                <input type="hidden" id="original_username" name="original_username">
+
+                <label for="new_username">اسم المستخدم:</label>
+                <input type="text" id="new_username" name="new_username" required>
+
+                <label for="new_password">كلمة المرور الجديدة:</label>
+                <input type="text" id="new_password" name="new_password" required>
+
+                <button type="submit" class="edit-btn" style="width: 100%; padding: 0.8rem; font-size: 1.1rem;">
+                    <i class="fa-solid fa-save"></i> حفظ التغييرات
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize particles.js
+            particlesJS("particles-js", {
+                "particles": {
+                    "number": {
+                        "value": 80,
+                        "density": {
+                            "enable": true,
+                            "value_area": 800
+                        }
+                    },
+                    "color": {
+                        "value": "#ffffff"
+                    },
+                    "shape": {
+                        "type": "circle",
+                        "stroke": {
+                            "width": 0,
+                            "color": "#000000"
+                        }
+                    },
+                    "opacity": {
+                        "value": 0.5,
+                        "random": true,
+                        "anim": {
+                            "enable": true,
+                            "speed": 1,
+                            "opacity_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "size": {
+                        "value": 3,
+                        "random": true,
+                        "anim": {
+                            "enable": true,
+                            "speed": 2,
+                            "size_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "line_linked": {
+                        "enable": true,
+                        "distance": 150,
+                        "color": "#ffffff",
+                        "opacity": 0.4,
+                        "width": 1
+                    },
+                    "move": {
+                        "enable": true,
+                        "speed": 2,
+                        "direction": "none",
+                        "random": true,
+                        "straight": false,
+                        "out_mode": "bounce",
+                        "bounce": true,
+                        "attract": {
+                            "enable": true,
+                            "rotateX": 600,
+                            "rotateY": 1200
+                        }
+                    }
+                },
+                "interactivity": {
+                    "detect_on": "canvas",
+                    "events": {
+                        "onhover": {
+                            "enable": true,
+                            "mode": "grab"
+                        },
+                        "onclick": {
+                            "enable": true,
+                            "mode": "push"
+                        },
+                        "resize": true
+                    },
+                    "modes": {
+                        "grab": {
+                            "distance": 140,
+                            "line_linked": {
+                                "opacity": 1
+                            }
+                        },
+                        "push": {
+                            "particles_nb": 4
+                        }
+                    }
+                },
+                "retina_detect": true
+            });
+
+            // Modal script
+            const modal = document.getElementById('editUserModal');
+            const editForm = document.getElementById('editUserForm');
+            const originalUsernameInput = document.getElementById('original_username');
+            const newUsernameInput = document.getElementById('new_username');
+            const newPasswordInput = document.getElementById('new_password');
+            const closeBtn = modal.querySelector('.close-btn');
+
+            document.querySelectorAll('.edit-btn[data-username]').forEach(button => {
+                button.addEventListener('click', () => {
+                    const username = button.dataset.username;
+                    const password = button.dataset.password;
+
+                    originalUsernameInput.value = username;
+                    newUsernameInput.value = username;
+                    newPasswordInput.value = password;
+
+                    modal.style.display = 'block';
+                });
+            });
+
+            closeBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+
+            window.addEventListener('click', (event) => {
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                }
+            });
+
+            // Sorting script
+            const tableBody = document.getElementById('userTableBody');
+            const rows = Array.from(tableBody.querySelectorAll('tr'));
+            const headers = document.querySelectorAll('th.sortable');
+
+            headers.forEach(header => {
+                header.addEventListener('click', () => {
+                    const columnIndex = parseInt(header.dataset.column);
+                    const sortType = header.dataset.type;
+                    let direction = header.dataset.direction || 'desc';
+
+                    // Toggle direction
+                    direction = direction === 'asc' ? 'desc' : 'asc';
+                    
+                    // Reset other headers
+                    headers.forEach(h => {
+                        h.classList.remove('sorted');
+                        h.dataset.direction = '';
+                        h.querySelector('.sort-icon').className = 'fas fa-sort sort-icon';
+                    });
+
+                    // Set current header state
+                    header.classList.add('sorted');
+                    header.dataset.direction = direction;
+                    header.querySelector('.sort-icon').className = `fas fa-sort-${direction === 'asc' ? 'up' : 'down'} sort-icon`;
+
+                    // Sort rows
+                    const sortedRows = rows.sort((a, b) => {
+                        const cellA = a.cells[columnIndex].innerText.trim();
+                        const cellB = b.cells[columnIndex].innerText.trim();
+
+                        let valA, valB;
+
+                        if (sortType === 'status') {
+                            // "متصل" (Online) = 1, "غير متصل" (Offline) = 0
+                            valA = cellA === 'متصل' ? 1 : 0;
+                            valB = cellB === 'متصل' ? 1 : 0;
+                        } else { // string
+                            valA = cellA;
+                            valB = cellB;
+                        }
+
+                        if (direction === 'asc') {
+                            if (valA < valB) return -1;
+                            if (valA > valB) return 1;
+                            return 0;
+                        } else {
+                            if (valA > valB) return -1;
+                            if (valA < valB) return 1;
+                            return 0;
+                        }
+                    });
+
+                    // Re-append rows
+                    tableBody.innerHTML = '';
+                    sortedRows.forEach(row => tableBody.appendChild(row));
+                });
+            });
+        });
+    </script>
+</body>
+</html>
